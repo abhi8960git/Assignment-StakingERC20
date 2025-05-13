@@ -50,10 +50,10 @@ curl -L https://foundry.paradigm.xyz | bash
 foundryup
 ```
 
-### 2. Build Contracts
+### 2. Compile Contracts
 
 ```bash
-forge build
+forge compile
 ```
 
 ### 3. Run Tests
