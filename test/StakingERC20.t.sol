@@ -64,4 +64,31 @@ contract CounterTest is Test {
 
         vm.stopPrank();
     }
+
+     function testZeroStakeReverts() public {
+        vm.expectRevert(StakingPool.ZeroAmount.selector);
+        vm.prank(user);
+        pool.stake(0);
+    }
+    function testUnstakeMoreThanStakedReverts() public {
+        vm.prank(user);
+        vm.expectRevert(StakingPool.InsufficientBalance.selector);
+        pool.unstake(1 ether);
+    }
+     function testClaimNoRewardsReverts() public {
+        vm.expectRevert(StakingPool.ZeroAmount.selector);
+        vm.prank(user);
+        pool.claimRewards();
+    }
+      function testAdminFundRewards() public {
+        uint256 beforeBalance = token.balanceOf(address(pool));
+        pool.fundRewards(200 ether);
+        uint256 afterBalance = token.balanceOf(address(pool));
+        assertEq(afterBalance - beforeBalance, 200 ether);
+    }
+    function testNonAdminFundReverts() public {
+        vm.prank(user);
+        vm.expectRevert(StakingPool.NotAdmin.selector);
+        pool.fundRewards(1 ether);
+    }
 }
