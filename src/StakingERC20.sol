@@ -78,4 +78,86 @@ contract StakingPool{
         admin = msg.sender;
     }
 
+     /// -----------------------------------------------------------------------
+    /// External Functions
+    /// -----------------------------------------------------------------------
+
+    /**
+     * @notice Stake tokens
+     * @param amount Amount of tokens to stake
+     */
+    function stake(uint256 amount) external nonReentrant {
+        if (amount == 0) revert ZeroAmount();
+        _updateRewards(msg.sender);
+
+        stakedBalance[msg.sender] += amount;
+        lastUpdate[msg.sender] = block.timestamp;
+
+        SafeERC20.safeTransferFrom(address(stakingToken), msg.sender, address(this), amount);
+        emit Staked(msg.sender, amount);
+    }
+
+     /**
+     * @notice Unstake tokens
+     * @param amount Amount to withdraw
+     */
+    function unstake(uint256 amount) external nonReentrant {
+        if (amount == 0) revert ZeroAmount();
+        if (stakedBalance[msg.sender] < amount) revert InsufficientBalance();
+
+        _updateRewards(msg.sender);
+
+        stakedBalance[msg.sender] -= amount;
+        lastUpdate[msg.sender] = block.timestamp;
+
+        SafeERC20.safeTransfer(address(stakingToken), msg.sender, amount);
+        emit Unstaked(msg.sender, amount);
+    }
+
+     /**
+     * @notice Claim accumulated rewards
+     */
+    function claimRewards() external nonReentrant {
+        _updateRewards(msg.sender);
+
+        uint256 reward = rewards[msg.sender];
+        if (reward == 0) revert ZeroAmount();
+        rewards[msg.sender] = 0;
+
+        SafeERC20.safeTransfer(address(stakingToken), msg.sender, reward);
+        emit RewardClaimed(msg.sender, reward);
+    }
+
+
+       /**
+     * @notice Admin can fund reward pool
+     * @param amount Tokens to fund
+     */
+    function fundRewards(uint256 amount) external onlyAdmin {
+        if (amount == 0) revert ZeroAmount();
+        SafeERC20.safeTransferFrom(address(stakingToken), msg.sender, address(this), amount);
+    }
+
+     /// -----------------------------------------------------------------------
+    /// Internal Functions
+    /// -----------------------------------------------------------------------
+
+    /**
+     * @dev Update reward state for user
+     * @param user Target address
+     */
+    function _updateRewards(address user) internal {
+        uint256 staked = stakedBalance[user];
+        uint256 last = lastUpdate[user];
+
+        if (staked == 0) {
+            lastUpdate[user] = block.timestamp;
+            return;
+        }
+
+        uint256 reward = rewardStrategy.calculateReward(user, staked, last);
+        rewards[user] += reward;
+        lastUpdate[user] = block.timestamp;
+    }
+
 }
