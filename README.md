@@ -91,13 +91,7 @@ forge script script/DeployStakingPool.s.sol --broadcast --rpc-url <your_rpc_url>
 * ✅ Custom errors reduce gas cost on failure
 * ✅ Uses `SafeERC20` to prevent transfer/transferFrom issues with broken tokens (e.g., USDT)
 
----
 
-## 📜 License
-
-MIT — Free to use, modify, and distribute.
-
----
 
 Let me know if you'd like to:
 
