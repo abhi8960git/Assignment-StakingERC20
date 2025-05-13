@@ -84,11 +84,3 @@ forge script script/DeployStakingPool.s.sol --broadcast --rpc-url <your_rpc_url>
 * ✅ Reentrancy guard on external entry points
 * ✅ Custom errors reduce gas cost on failure
 * ✅ Uses `SafeERC20` to prevent transfer/transferFrom issues with broken tokens (e.g., USDT)
-
-
-
-Let me know if you'd like to:
-
-* Move `MockERC20.sol` into `src/` for cleaner structure
-* Add a `Makefile` or script to automate deployment
-* Configure GitHub Actions to run `forge test` in CI
