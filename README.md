@@ -14,7 +14,7 @@ This project implements a secure and gas-efficient **ERC20 staking pool** with a
 * 🧱 Flat-rate reward distribution per second
 * 🔐 Reentrancy-safe, access-controlled, and gas-optimized
 * 🧪 Fully unit-tested with `forge test`
-* 💡 Includes a minimal in-project `MockERC20` (in `script/`) for testing
+* 💡 Includes a minimal in-project `MockERC20` (in `src/utils`) for testing
 * 🧰 Uses a safe low-level ERC20 wrapper (`SafeERC20`)
 
 ---
@@ -53,7 +53,7 @@ forge compile
 ### 3. Run Tests
 
 ```bash
-forge test -vvvv
+forge test 
 ```
 
 ---
