@@ -33,13 +33,7 @@ Where:
 
 ---
 
-## 📂 Project Structure
 
-
-
-> ✅ Note: `MockERC20.sol` is placed in `script/` instead of `src/`, so it must be imported accordingly in tests and scripts.
-
----
 
 ## ⚙️ Setup
 
