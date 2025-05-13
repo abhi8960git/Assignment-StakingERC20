@@ -91,4 +91,24 @@ contract CounterTest is Test {
         vm.expectRevert(StakingPool.NotAdmin.selector);
         pool.fundRewards(1 ether);
     }
+
+    
+    function testMultipleStakesUpdatesRewards() public {
+        vm.startPrank(user);
+
+        pool.stake(50 ether);
+        skip(5);
+
+        pool.stake(50 ether); // triggers reward calc for first 50
+
+        skip(10);
+        uint256 before = token.balanceOf(user);
+        pool.claimRewards();
+        uint256 reward = token.balanceOf(user) - before;
+
+        assertGt(reward, 0);
+        assertEq(pool.stakedBalance(user), 100 ether);
+
+        vm.stopPrank();
+    }
 }
