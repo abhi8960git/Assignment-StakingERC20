@@ -35,7 +35,7 @@ contract CounterTest is Test {
         token.approve(address(pool), type(uint256).max);
     }
 
-      function testStakeAndUnstakeFlow() public {
+    function testStakeAndUnstakeFlow() public {
         vm.prank(user);
         pool.stake(100 ether);
         assertEq(pool.stakedBalance(user), 100 ether);
@@ -48,5 +48,20 @@ contract CounterTest is Test {
         assertEq(pool.stakedBalance(user), 0);
         uint256 finalBal = token.balanceOf(user);
         assertGt(finalBal, 100 ether); // includes reward
+    }
+
+    function testClaimRewardsAfterTime() public {
+        vm.startPrank(user);
+        pool.stake(200 ether);
+        skip(15); //simulate for 15s
+        uint256 beforeBalance = token.balanceOf(user);
+        pool.claimRewards();
+        uint256 afterBalance = token.balanceOf(user);
+        uint256 reward = afterBalance - beforeBalance;
+
+        uint256 expected = (200 ether * 15 * 1e12) / 1e18;
+        assertApproxEqAbs(reward, expected, 1);
+
+        vm.stopPrank();
     }
 }
