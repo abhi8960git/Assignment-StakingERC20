@@ -7,5 +7,46 @@ import "../src/utils/FlatRateRewardStrategy.sol";
 import "../src/StakingERC20.sol";
 
 contract CounterTest is Test {
-  
+    MockERC20 public token;
+    FlatRateRewardStrategy public strategy;
+    StakingPool public pool;
+
+    address public admin;
+    address public user;
+
+    function setUp() public {
+        admin = address(this);
+        user = address(0xBEEF);
+
+        // Deploy mock token and mint
+        token = new MockERC20("StakeToken", "STK", 18);
+        token.mint(admin, 1_000 ether);
+        token.mint(user, 1_000 ether);
+
+        // Deploy reward strategy: 0.000001 token/sec per token
+        strategy = new FlatRateRewardStrategy(1e12);
+
+        // Deploy staking pool
+        pool = new StakingPool(address(token), address(strategy));
+
+        // Approve staking pool from both accounts
+        token.approve(address(pool), type(uint256).max);
+        vm.prank(user);
+        token.approve(address(pool), type(uint256).max);
+    }
+
+      function testStakeAndUnstakeFlow() public {
+        vm.prank(user);
+        pool.stake(100 ether);
+        assertEq(pool.stakedBalance(user), 100 ether);
+
+        skip(10); // simulate 10 seconds
+
+        vm.prank(user);
+        pool.unstake(100 ether);
+
+        assertEq(pool.stakedBalance(user), 0);
+        uint256 finalBal = token.balanceOf(user);
+        assertGt(finalBal, 100 ether); // includes reward
+    }
 }
